@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dokumentasi Diagram Sistem Inventaris JJ Mart</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    header h1 {
+      font-size: 28px;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+    header p {
+      color: #64748b;
+      font-size: 15px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.05);
+    }
+    .badge {
+      display: inline-block;
+      align-self: flex-start;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+    }
+    .badge-erd { background: #dbeafe; color: #1e40af; }
+    .badge-class { background: #dcfce7; color: #166534; }
+    .badge-act { background: #fef3c7; color: #92400e; }
+    .badge-use { background: #ede9fe; color: #5b21b6; }
+    .badge-flow { background: #fee2e2; color: #991b1b; }
+
+    .card h2 {
+      font-size: 18px;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+    .card p {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+    .card a {
+      display: inline-block;
+      text-align: center;
+      background: #2563eb;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 16px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .card a:hover {
+      background: #1d4ed8;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Pusat Dokumentasi Diagram Sistem</h1>
+      <p>Inventaris JJ Mart &bull; Berbasis Laravel + Vue SPA (Tanpa Bot Telegram)</p>
+    </header>
+
+    <div class="grid">
+      <!-- ERD -->
+      <div class="card">
+        <div>
+          <span class="badge badge-erd">Database</span>
+          <h2>Entity Relationship Diagram (ERD)</h2>
+          <p>Memetakan relasi antar entitas basis data: Users, Kategori, Pemasok, Barang, Transaksi, dan Log Notifikasi beserta tipe data, PK, dan FK.</p>
+        </div>
+        <a href="erd_diagram.html" target="_blank">Buka ERD &rarr;</a>
+      </div>
+
+      <!-- Class Diagram -->
+      <div class="card">
+        <div>
+          <span class="badge badge-class">Arsitektur Kode</span>
+          <h2>Class Diagram</h2>
+          <p>Struktur OOP sistem yang mencakup Models (Eloquent), Controllers (REST API), dan Services (Hitung ROP & Cek Stok internal).</p>
+        </div>
+        <a href="class_diagram.html" target="_blank">Buka Class Diagram &rarr;</a>
+      </div>
+
+      <!-- Activity Diagram -->
+      <div class="card">
+        <div>
+          <span class="badge badge-act">Alur Kerja</span>
+          <h2>Activity Diagram</h2>
+          <p>Alur aktivitas 2 swimlane (Staff Gudang & Sistem): Transaksi Masuk/Keluar, update stok otomatis, serta validasi batas ROP/Safety Stock.</p>
+        </div>
+        <a href="activity_diagram.html" target="_blank">Buka Activity Diagram &rarr;</a>
+      </div>
+
+      <!-- Use Case Diagram -->
+      <div class="card">
+        <div>
+          <span class="badge badge-use">Fungsional</span>
+          <h2>Use Case Diagram</h2>
+          <p>Pemetaan hak akses 2 peran: Manager (analitik dasbor, ROP, laporan, data master) dan Staff Gudang (input barang, transaksi, cek stok).</p>
+        </div>
+        <a href="usecase_diagram.html" target="_blank">Buka Use Case Diagram &rarr;</a>
+      </div>
+
+      <!-- Alur Sistem / Flowchart -->
+      <div class="card">
+        <div>
+          <span class="badge badge-flow">Flowchart</span>
+          <h2>Alur Sistem Transaksi</h2>
+          <p>Flowchart swimlane proses operasional transaksi inventaris dari input data hingga pencatatan log sistem.</p>
+        </div>
+        <a href="alur_sistem.html" target="_blank">Buka Alur Sistem &rarr;</a>
+      </div>
+    </div>
+
+    <footer>
+      Inventaris JJ Mart &copy; 2026 &bull; Format SVG Murni &bull; Siap dicetak / diekspor
+    </footer>
+  </div>
+</body>
+</html>

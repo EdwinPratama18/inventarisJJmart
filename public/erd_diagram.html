@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <title>ERD - Inventaris JJ Mart</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #b0b0b0;
+      font-family: Arial, sans-serif;
+      padding: 28px 18px 50px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      color: #222;
+      margin-bottom: 16px;
+    }
+
+    .wrap {
+      display: flex;
+      justify-content: center;
+    }
+
+    svg {
+      background: white;
+      border: 2px solid #444;
+      box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Entity Relationship Diagram (ERD) - Sistem Inventaris JJ Mart</h1>
+  <div class="wrap">
+    <svg width="1020" height="820" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif" font-size="10">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#555" />
+        </marker>
+      </defs>
+
+      <!-- ===== ENTITY: kategori (x=40, y=30, w=240) ===== -->
+      <rect x="40" y="30" width="240" height="132" fill="white" stroke="#333" stroke-width="1.5" rx="3" />
+      <rect x="40" y="30" width="240" height="32" fill="#1a3a5c" rx="3" />
+      <rect x="40" y="50" width="240" height="12" fill="#1a3a5c" />
+      <text x="160" y="51" text-anchor="middle" font-size="12" font-weight="bold" fill="white">kategori</text>
+      <!-- fields -->
+      <rect x="40" y="62" width="240" height="20" fill="#fffbeb" />
+      <text x="48" y="76" font-weight="bold" fill="#b45309">PK</text><text x="66" y="76"> id</text><text x="277" y="76"
+        text-anchor="end" fill="#888">INT</text>
+      <line x1="40" y1="82" x2="280" y2="82" stroke="#eee" />
+      <text x="48" y="96"> nama</text><text x="277" y="96" text-anchor="end" fill="#888">VARCHAR(100)</text>
+      <line x1="40" y1="102" x2="280" y2="102" stroke="#eee" />
+      <text x="48" y="116"> deskripsi</text><text x="277" y="116" text-anchor="end" fill="#888">TEXT</text>
+      <line x1="40" y1="122" x2="280" y2="122" stroke="#eee" />
+      <text x="48" y="136" fill="#aaa"> created_at</text><text x="277" y="136" text-anchor="end"
+        fill="#bbb">TIMESTAMP</text>
+      <line x1="40" y1="142" x2="280" y2="142" stroke="#eee" />
+      <text x="48" y="156" fill="#aaa"> updated_at</text><text x="277" y="156" text-anchor="end"
+        fill="#bbb">TIMESTAMP</text>
+
+      <!-- ===== ENTITY: users (x=40, y=210, w=240) ===== -->
+      <rect x="40" y="210" width="240" height="152" fill="white" stroke="#333" stroke-width="1.5" rx="3" />
+      <rect x="40" y="210" width="240" height="32" fill="#1a3a5c" rx="3" />
+      <rect x="40" y="230" width="240" height="12" fill="#1a3a5c" />
+      <text x="160" y="231" text-anchor="middle" font-size="12" font-weight="bold" fill="white">users</text>
+      <rect x="40" y="242" width="240" height="20" fill="#fffbeb" />
+      <text x="48" y="256" font-weight="bold" fill="#b45309">PK</text><text x="66" y="256"> id</text><text x="277"
+        y="256" text-anchor="end" fill="#888">INT</text>
+      <line x1="40" y1="262" x2="280" y2="262" stroke="#eee" />
+      <text x="48" y="276"> name</text><text x="277" y="276" text-anchor="end" fill="#888">VARCHAR</text>
+      <line x1="40" y1="282" x2="280" y2="282" stroke="#eee" />
+      <text x="48" y="296"> email</text><text x="277" y="296" text-anchor="end" fill="#888">VARCHAR</text>
+      <line x1="40" y1="302" x2="280" y2="302" stroke="#eee" />
+      <text x="48" y="316"> password</text><text x="277" y="316" text-anchor="end" fill="#888">VARCHAR</text>
+      <line x1="40" y1="322" x2="280" y2="322" stroke="#eee" />
+      <text x="48" y="336"> peran</text><text x="277" y="336" text-anchor="end" fill="#888">ENUM(admin,petugas)</text>
+      <line x1="40" y1="342" x2="280" y2="342" stroke="#eee" />
+      <text x="48" y="356" fill="#aaa"> created_at / updated_at</text>
+
+      <!-- ===== ENTITY: barang (x=370, y=30, w=275) ===== -->
+      <rect x="370" y="30" width="275" height="412" fill="white" stroke="#333" stroke-width="1.5" rx="3" />
+      <rect x="370" y="30" width="275" height="32" fill="#1a3a5c" rx="3" />
+      <rect x="370" y="50" width="275" height="12" fill="#1a3a5c" />
+      <text x="507" y="51" text-anchor="middle" font-size="12" font-weight="bold" fill="white">barang</text>
+      <rect x="370" y="62" width="275" height="20" fill="#fffbeb" />
+      <text x="378" y="76" font-weight="bold" fill="#b45309">PK</text><text x="396" y="76"> id</text><text x="642"
+        y="76" text-anchor="end" fill="#888">INT</text>
+      <line x1="370" y1="82" x2="645" y2="82" stroke="#eee" />
+      <text x="378" y="96"> kode_barang</text><text x="642" y="96" text-anchor="end" fill="#888">VARCHAR(50)</text>
+      <line x1="370" y1="102" x2="645" y2="102" stroke="#eee" />
+      <text x="378" y="116"> nama</text><text x="642" y="116" text-anchor="end" fill="#888">VARCHAR(150)</text>
+      <line x1="370" y1="122" x2="645" y2="122" stroke="#eee" />
+      <rect x="370" y="122" width="275" height="20" fill="#eff6ff" />
+      <text x="378" y="136" font-weight="bold" fill="#1d4ed8">FK</text><text x="396" y="136"> kategori_id</text><text
+        x="642" y="136" text-anchor="end" fill="#888">INT</text>
+      <line x1="370" y1="142" x2="645" y2="142" stroke="#eee" />
+      <rect x="370" y="142" width="275" height="20" fill="#eff6ff" />
+      <text x="378" y="156" font-weight="bold" fill="#1d4ed8">FK</text><text x="396" y="156"> pemasok_id</text><text
+        x="642" y="156" text-anchor="end" fill="#888">INT</text>
+      <line x1="370" y1="162" x2="645" y2="162" stroke="#eee" />
+      <text x="378" y="176"> satuan</text><text x="642" y="176" text-anchor="end" fill="#888">VARCHAR(30)</text>
+      <line x1="370" y1="182" x2="645" y2="182" stroke="#eee" />
+      <text x="378" y="196"> stok_saat_ini</text><text x="642" y="196" text-anchor="end" fill="#888">INT</text>
+      <line x1="370" y1="202" x2="645" y2="202" stroke="#eee" />
+      <text x="378" y="216"> stok_minimum</text><text x="642" y="216" text-anchor="end" fill="#888">INT</text>
+      <line x1="370" y1="222" x2="645" y2="222" stroke="#eee" />
+      <text x="378" y="236"> harga_beli</text><text x="642" y="236" text-anchor="end" fill="#888">DECIMAL(15,2)</text>
+      <line x1="370" y1="242" x2="645" y2="242" stroke="#eee" />
+      <text x="378" y="256"> harga_jual</text><text x="642" y="256" text-anchor="end" fill="#888">DECIMAL(15,2)</text>
+      <line x1="370" y1="262" x2="645" y2="262" stroke="#eee" />
+      <text x="378" y="276"> lead_time_hari</text><text x="642" y="276" text-anchor="end" fill="#888">INT</text>
+      <line x1="370" y1="282" x2="645" y2="282" stroke="#eee" />
+      <text x="378" y="296"> rata_pemakaian_harian</text><text x="642" y="296" text-anchor="end"
+        fill="#888">DECIMAL</text>
+      <line x1="370" y1="302" x2="645" y2="302" stroke="#eee" />
+      <text x="378" y="316"> rop</text><text x="642" y="316" text-anchor="end" fill="#888">INT</text>
+      <line x1="370" y1="322" x2="645" y2="322" stroke="#eee" />
+      <text x="378" y="336"> lokasi_rak</text><text x="642" y="336" text-anchor="end" fill="#888">VARCHAR(50)</text>
+      <line x1="370" y1="342" x2="645" y2="342" stroke="#eee" />
+      <text x="378" y="356"> deskripsi</text><text x="642" y="356" text-anchor="end" fill="#888">TEXT</text>
+      <line x1="370" y1="362" x2="645" y2="362" stroke="#eee" />
+      <text x="378" y="376"> aktif</text><text x="642" y="376" text-anchor="end" fill="#888">BOOLEAN</text>
+      <line x1="370" y1="382" x2="645" y2="382" stroke="#eee" />
+      <text x="378" y="396" fill="#aaa"> created_at</text>
+      <line x1="370" y1="402" x2="645" y2="402" stroke="#eee" />
+      <text x="378" y="416" fill="#aaa"> updated_at</text>
+
+      <!-- ===== ENTITY: pemasok (x=730, y=30, w=250) ===== -->
+      <rect x="730" y="30" width="250" height="192" fill="white" stroke="#333" stroke-width="1.5" rx="3" />
+      <rect x="730" y="30" width="250" height="32" fill="#1a3a5c" rx="3" />
+      <rect x="730" y="50" width="250" height="12" fill="#1a3a5c" />
+      <text x="855" y="51" text-anchor="middle" font-size="12" font-weight="bold" fill="white">pemasok</text>
+      <rect x="730" y="62" width="250" height="20" fill="#fffbeb" />
+      <text x="738" y="76" font-weight="bold" fill="#b45309">PK</text><text x="756" y="76"> id</text><text x="977"
+        y="76" text-anchor="end" fill="#888">INT</text>
+      <line x1="730" y1="82" x2="980" y2="82" stroke="#eee" />
+      <text x="738" y="96"> nama</text><text x="977" y="96" text-anchor="end" fill="#888">VARCHAR(150)</text>
+      <line x1="730" y1="102" x2="980" y2="102" stroke="#eee" />
+      <text x="738" y="116"> kontak</text><text x="977" y="116" text-anchor="end" fill="#888">VARCHAR(100)</text>
+      <line x1="730" y1="122" x2="980" y2="122" stroke="#eee" />
+      <text x="738" y="136"> telepon</text><text x="977" y="136" text-anchor="end" fill="#888">VARCHAR(30)</text>
+      <line x1="730" y1="142" x2="980" y2="142" stroke="#eee" />
+      <text x="738" y="156"> email</text><text x="977" y="156" text-anchor="end" fill="#888">VARCHAR(100)</text>
+      <line x1="730" y1="162" x2="980" y2="162" stroke="#eee" />
+      <text x="738" y="176"> alamat</text><text x="977" y="176" text-anchor="end" fill="#888">TEXT</text>
+      <line x1="730" y1="182" x2="980" y2="182" stroke="#eee" />
+      <text x="738" y="196" fill="#aaa"> created_at / updated_at</text>
+
+      <!-- ===== ENTITY: transaksi (x=370, y=490, w=275) ===== -->
+      <rect x="370" y="490" width="275" height="292" fill="white" stroke="#333" stroke-width="1.5" rx="3" />
+      <rect x="370" y="490" width="275" height="32" fill="#1a3a5c" rx="3" />
+      <rect x="370" y="510" width="275" height="12" fill="#1a3a5c" />
+      <text x="507" y="511" text-anchor="middle" font-size="12" font-weight="bold" fill="white">transaksi</text>
+      <rect x="370" y="522" width="275" height="20" fill="#fffbeb" />
+      <text x="378" y="536" font-weight="bold" fill="#b45309">PK</text><text x="396" y="536"> id</text><text x="642"
+        y="536" text-anchor="end" fill="#888">INT</text>
+      <line x1="370" y1="542" x2="645" y2="542" stroke="#eee" />
+      <rect x="370" y="542" width="275" height="20" fill="#eff6ff" />
+      <text x="378" y="556" font-weight="bold" fill="#1d4ed8">FK</text><text x="396" y="556"> barang_id</text><text
+        x="642" y="556" text-anchor="end" fill="#888">INT</text>
+      <line x1="370" y1="562" x2="645" y2="562" stroke="#eee" />
+      <text x="378" y="576"> jenis</text><text x="642" y="576" text-anchor="end" fill="#888">ENUM(masuk,keluar)</text>
+      <line x1="370" y1="582" x2="645" y2="582" stroke="#eee" />
+      <text x="378" y="596"> jumlah</text><text x="642" y="596" text-anchor="end" fill="#888">INT</text>
+      <line x1="370" y1="602" x2="645" y2="602" stroke="#eee" />
+      <text x="378" y="616"> stok_sebelum</text><text x="642" y="616" text-anchor="end" fill="#888">INT</text>
+      <line x1="370" y1="622" x2="645" y2="622" stroke="#eee" />
+      <text x="378" y="636"> stok_sesudah</text><text x="642" y="636" text-anchor="end" fill="#888">INT</text>
+      <line x1="370" y1="642" x2="645" y2="642" stroke="#eee" />
+      <text x="378" y="656"> harga_satuan</text><text x="642" y="656" text-anchor="end" fill="#888">DECIMAL(15,2)</text>
+      <line x1="370" y1="662" x2="645" y2="662" stroke="#eee" />
+      <text x="378" y="676"> referensi</text><text x="642" y="676" text-anchor="end" fill="#888">VARCHAR(100)</text>
+      <line x1="370" y1="682" x2="645" y2="682" stroke="#eee" />
+      <rect x="370" y="682" width="275" height="20" fill="#eff6ff" />
+      <text x="378" y="696" font-weight="bold" fill="#1d4ed8">FK</text><text x="396" y="696"> pengguna_id</text><text
+        x="642" y="696" text-anchor="end" fill="#888">INT</text>
+      <line x1="370" y1="702" x2="645" y2="702" stroke="#eee" />
+      <text x="378" y="716"> catatan</text><text x="642" y="716" text-anchor="end" fill="#888">TEXT</text>
+      <line x1="370" y1="722" x2="645" y2="722" stroke="#eee" />
+      <text x="378" y="736"> tanggal</text><text x="642" y="736" text-anchor="end" fill="#888">TIMESTAMP</text>
+      <line x1="370" y1="742" x2="645" y2="742" stroke="#eee" />
+      <text x="378" y="756" fill="#aaa"> created_at / updated_at</text>
+
+      <!-- ===== RELATIONSHIPS ===== -->
+      <!-- 1. kategori 1 --- N barang (via kategori_id) -->
+      <line x1="280" y1="96" x2="370" y2="132" stroke="#555" stroke-width="1.5" />
+      <text x="288" y="90" font-size="11" font-weight="bold">1</text>
+      <text x="356" y="125" font-size="11" font-weight="bold">N</text>
+
+      <!-- 2. pemasok 1 --- N barang (via pemasok_id) -->
+      <line x1="730" y1="126" x2="645" y2="152" stroke="#555" stroke-width="1.5" />
+      <text x="715" y="120" font-size="11" font-weight="bold">1</text>
+      <text x="650" y="146" font-size="11" font-weight="bold">N</text>
+
+      <!-- 3. barang 1 --- N transaksi (via barang_id) -->
+      <line x1="507" y1="442" x2="507" y2="490" stroke="#555" stroke-width="1.5" />
+      <text x="515" y="458" font-size="11" font-weight="bold">1</text>
+      <text x="515" y="482" font-size="11" font-weight="bold">N</text>
+
+      <!-- 4. users 1 --- N transaksi (via pengguna_id) -->
+      <path d="M 280,286 L 325,286 L 325,692 L 370,692" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="5,3" />
+      <text x="286" y="280" font-size="11" font-weight="bold">1</text>
+      <text x="354" y="686" font-size="11" font-weight="bold">N</text>
+
+      <!-- Legend -->
+      <rect x="730" y="270" width="250" height="110" rx="3" fill="white" stroke="#bbb" stroke-width="1" />
+      <text x="855" y="290" text-anchor="middle" font-size="11" font-weight="bold">Keterangan ERD</text>
+      <rect x="745" y="302" width="20" height="14" fill="#fffbeb" stroke="#ddd" />
+      <text x="773" y="313" font-size="10">= Primary Key (PK)</text>
+      <rect x="745" y="324" width="20" height="14" fill="#eff6ff" stroke="#ddd" />
+      <text x="773" y="335" font-size="10">= Foreign Key (FK)</text>
+      <line x1="745" y1="352" x2="765" y2="352" stroke="#555" stroke-width="1.5" />
+      <text x="773" y="356" font-size="10">= Relasi Wajib (1 to Many)</text>
+      <line x1="745" y1="368" x2="765" y2="368" stroke="#555" stroke-width="1.5" stroke-dasharray="4,2" />
+      <text x="773" y="372" font-size="10">= Relasi Opsional (Nullable FK)</text>
+    </svg>
+  </div>
+</body>
+
+</html>
