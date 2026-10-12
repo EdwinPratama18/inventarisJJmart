@@ -9,16 +9,97 @@
 
         <!-- Right Controls -->
         <div class="header-right-controls">
-            <!-- Notifikasi Stok Kritis -->
-            <button
-                v-if="jmlKritis > 0"
-                class="header-icon-btn"
-                @click="$emit('lihat-kritis')"
-                title="Peringatan Stok Kritis (Mencapai ROP)"
-            >
-                <Ikon nama="bell" :ukuran="18" />
-                <span class="header-notif-dot">{{ jmlKritis }}</span>
-            </button>
+            <!-- Notifikasi Stok Kritis & Reorder Point -->
+            <div class="notification-dropdown-container">
+                <button
+                    class="header-icon-btn"
+                    :class="{ active: notifBuka, 'has-alert': jmlKritis > 0 }"
+                    @click="toggleNotifikasi"
+                    :title="jmlKritis > 0 ? `${jmlKritis} barang perlu di-reorder` : 'Semua stok dalam kondisi aman'"
+                    aria-label="Pemberitahuan Reorder"
+                >
+                    <Ikon
+                        nama="bell"
+                        :ukuran="19"
+                        :class="{ 'bell-alert-anim': jmlKritis > 0 }"
+                    />
+                    <!-- Tanda Notif Dot Merah: HANYA MUNCUL JIKA ADA BARANG YANG PERLU DI-REORDER -->
+                    <span v-if="jmlKritis > 0" class="header-notif-dot">
+                        {{ jmlKritis > 99 ? '99+' : jmlKritis }}
+                    </span>
+                </button>
+
+                <!-- Dropdown Popup Notifikasi -->
+                <Transition name="dropdown">
+                    <div v-if="notifBuka" class="notif-popup">
+                        <div class="notif-header d-flex align-center justify-between">
+                            <div class="d-flex align-center gap-2">
+                                <Ikon nama="bell" :ukuran="17" style="color:var(--clr-primary);" />
+                                <span class="notif-title">Notifikasi Reorder</span>
+                            </div>
+                            <span v-if="jmlKritis > 0" class="badge-notif-danger">
+                                {{ jmlKritis }} Perlu Dipesan
+                            </span>
+                            <span v-else class="badge-notif-safe">
+                                Stok Optimal
+                            </span>
+                        </div>
+
+                        <!-- KONTEN: JIKA ADA BARANG PERLU REORDER (> 0) -->
+                        <div v-if="jmlKritis > 0" class="notif-content-scrollable">
+                            <div class="notif-banner-alert">
+                                <strong>Peringatan Titik Kritis:</strong> Stok barang berikut berada pada atau di bawah batas minimum pemesanan ulang (ROP):
+                            </div>
+                            <div class="notif-item-list">
+                                <div
+                                    v-for="b in daftarKritis"
+                                    :key="b.id"
+                                    class="notif-item-card"
+                                    @click="keHalamanRop"
+                                >
+                                    <div
+                                        class="notif-item-badge-icon"
+                                        :class="b.stok_saat_ini <= 0 ? 'bg-habis' : 'bg-kritis'"
+                                    >
+                                        <Ikon :nama="b.stok_saat_ini <= 0 ? 'kritis' : 'warning'" :ukuran="16" />
+                                    </div>
+                                    <div class="notif-item-info">
+                                        <div class="notif-item-title">{{ b.nama }}</div>
+                                        <div class="notif-item-meta">
+                                            <span class="font-mono text-muted">{{ b.kode_barang }}</span>
+                                            <span class="sep">&bull;</span>
+                                            <span>Stok: <strong :class="b.stok_saat_ini <= 0 ? 'text-danger' : 'text-main'">{{ b.stok_saat_ini }}</strong> / ROP: {{ b.rop }}</span>
+                                        </div>
+                                        <div class="notif-item-deficit">
+                                            Defisit Order: <strong class="text-danger">+{{ hitungDefisit(b) }} {{ b.satuan || 'unit' }}</strong>
+                                        </div>
+                                    </div>
+                                    <Ikon nama="chevron-right" :ukuran="14" class="notif-item-arrow" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- KONTEN: JIKA TIDAK ADA BARANG PERLU REORDER (=== 0) -->
+                        <div v-else class="notif-empty-state">
+                            <div class="notif-empty-icon-circle">
+                                <Ikon nama="check" :ukuran="26" />
+                            </div>
+                            <h4 class="notif-empty-title">Semua Posisi Stok Aman</h4>
+                            <p class="notif-empty-desc">
+                                Tidak ada barang yang memerlukan pemesanan ulang saat ini. Seluruh stok gudang berada di atas ambang batas Reorder Point (ROP).
+                            </p>
+                        </div>
+
+                        <!-- Footer Dropdown -->
+                        <div class="notif-footer">
+                            <button class="notif-footer-btn" @click="keHalamanRop">
+                                <span>Buka Halaman Reorder Point (ROP)</span>
+                                <Ikon nama="chevron-right" :ukuran="14" />
+                            </button>
+                        </div>
+                    </div>
+                </Transition>
+            </div>
 
             <!-- Divider -->
             <div class="header-divider"></div>
@@ -28,7 +109,7 @@
                 <button
                     class="profile-trigger-btn"
                     :class="{ active: menuBuka }"
-                    @click="menuBuka = !menuBuka"
+                    @click="toggleMenu"
                 >
                     <div class="profile-avatar">{{ inisialPengguna }}</div>
                     <div class="profile-meta">
@@ -74,8 +155,8 @@
             </div>
         </div>
 
-        <!-- Backdrop -->
-        <div v-if="menuBuka" class="dropdown-backdrop" @click="menuBuka = false"></div>
+        <!-- Backdrops untuk menutup dropdown ketika klik di luar -->
+        <div v-if="menuBuka || notifBuka" class="dropdown-backdrop" @click="tutupSemuaDropdown"></div>
 
         <!-- Modal Konfirmasi Logout -->
         <Teleport to="body" v-if="tampilModalLogout">
@@ -99,20 +180,23 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { gunakanTokoAutentikasi } from '../toko/autentikasi';
+import { gunakanTokoNotifikasi } from '../toko/notifikasi';
 import Ikon from './Ikon.vue';
 
-defineProps({ jmlKritis: { type: Number, default: 0 } });
-defineEmits(['lihat-kritis']);
-
 const toko = gunakanTokoAutentikasi();
+const notifStore = gunakanTokoNotifikasi();
 const route = useRoute();
 const router = useRouter();
 
 const menuBuka = ref(false);
+const notifBuka = ref(false);
 const tampilModalLogout = ref(false);
+
+const jmlKritis = computed(() => notifStore.jmlKritis);
+const daftarKritis = computed(() => notifStore.daftarKritis);
 
 const judulMap = {
     dasbor: 'Dashboard',
@@ -131,8 +215,39 @@ const inisialPengguna = computed(() => {
     return name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
 });
 
-function bukaModalKonfirmasi() {
+function toggleNotifikasi() {
     menuBuka.value = false;
+    notifBuka.value = !notifBuka.value;
+    if (notifBuka.value) {
+        notifStore.muatNotifikasi();
+    }
+}
+
+function toggleMenu() {
+    notifBuka.value = false;
+    menuBuka.value = !menuBuka.value;
+}
+
+function tutupSemuaDropdown() {
+    menuBuka.value = false;
+    notifBuka.value = false;
+}
+
+function keHalamanRop() {
+    tutupSemuaDropdown();
+    if (toko.isAdmin) {
+        router.push('/rop');
+    } else {
+        router.push('/barang');
+    }
+}
+
+function hitungDefisit(b) {
+    return Math.max(0, (b.rop || 0) - (b.stok_saat_ini || 0));
+}
+
+function bukaModalKonfirmasi() {
+    tutupSemuaDropdown();
     tampilModalLogout.value = true;
 }
 
@@ -141,6 +256,10 @@ async function eksekusiKeluar() {
     await toko.keluar();
     router.push('/login');
 }
+
+onMounted(() => {
+    notifStore.muatNotifikasi();
+});
 </script>
 
 <style scoped>
@@ -184,9 +303,15 @@ async function eksekusiKeluar() {
     gap: 0.75rem;
 }
 
+/* Notification Container & Trigger */
+.notification-dropdown-container {
+    position: relative;
+    z-index: 30;
+}
+
 .header-icon-btn {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: var(--radius-md);
     background: transparent;
     border: none;
@@ -196,27 +321,237 @@ async function eksekusiKeluar() {
     align-items: center;
     justify-content: center;
     position: relative;
-    transition: background var(--transition);
+    transition: all var(--transition);
 }
-.header-icon-btn:hover {
+.header-icon-btn:hover,
+.header-icon-btn.active {
     background-color: #f1f5f9;
+    color: var(--clr-primary);
 }
+.header-icon-btn.has-alert {
+    color: #e11d48;
+}
+
 .header-notif-dot {
     position: absolute;
     top: 4px;
     right: 4px;
-    background: var(--clr-danger);
+    background: #e11d48;
     color: #ffffff;
-    font-size: 0.65rem;
-    font-weight: 700;
-    min-width: 16px;
-    height: 16px;
+    font-size: 0.625rem;
+    font-weight: 800;
+    min-width: 17px;
+    height: 17px;
     border-radius: 99px;
     display: flex;
     align-items: center;
     justify-content: center;
     border: 2px solid #ffffff;
-    padding: 0 0.2rem;
+    padding: 0 0.25rem;
+    line-height: 1;
+    box-shadow: 0 2px 4px rgba(225, 29, 72, 0.35);
+}
+
+.bell-alert-anim {
+    animation: bell-tilt 2.5s infinite ease-in-out;
+}
+
+@keyframes bell-tilt {
+    0%, 100% { transform: rotate(0); }
+    5% { transform: rotate(14deg); }
+    10% { transform: rotate(-14deg); }
+    15% { transform: rotate(10deg); }
+    20% { transform: rotate(-10deg); }
+    25% { transform: rotate(0); }
+}
+
+/* Notification Popup */
+.notif-popup {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 340px;
+    max-width: 90vw;
+    background: #ffffff;
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-modal);
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.notif-header {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--clr-border);
+    background: #fafbfc;
+}
+.notif-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--clr-text-main);
+}
+.badge-notif-danger {
+    font-size: 0.675rem;
+    font-weight: 700;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    padding: 0.15rem 0.5rem;
+    border-radius: 99px;
+}
+.badge-notif-safe {
+    font-size: 0.675rem;
+    font-weight: 700;
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+    padding: 0.15rem 0.5rem;
+    border-radius: 99px;
+}
+
+.notif-content-scrollable {
+    max-height: 310px;
+    overflow-y: auto;
+}
+
+.notif-banner-alert {
+    padding: 0.6rem 0.95rem;
+    background: #fff1f2;
+    border-bottom: 1px solid #ffe4e6;
+    font-size: 0.735rem;
+    color: #9f1239;
+    line-height: 1.35;
+}
+
+.notif-item-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.notif-item-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.notif-item-card:hover {
+    background-color: #f8fafc;
+}
+.notif-item-card:last-child {
+    border-bottom: none;
+}
+
+.notif-item-badge-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.bg-habis {
+    background: #fee2e2;
+    color: #dc2626;
+}
+.bg-kritis {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.notif-item-info {
+    flex: 1;
+    min-width: 0;
+}
+.notif-item-title {
+    font-size: 0.815rem;
+    font-weight: 600;
+    color: var(--clr-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.notif-item-meta {
+    font-size: 0.725rem;
+    color: var(--clr-text-muted);
+    margin: 1px 0;
+}
+.notif-item-meta .sep {
+    color: #cbd5e1;
+    margin: 0 3px;
+}
+.notif-item-deficit {
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.notif-item-arrow {
+    color: #cbd5e1;
+    transition: transform 0.15s;
+}
+.notif-item-card:hover .notif-item-arrow {
+    color: var(--clr-primary);
+    transform: translateX(2px);
+}
+
+/* Empty State Notifikasi */
+.notif-empty-state {
+    padding: 2rem 1.25rem;
+    text-align: center;
+}
+.notif-empty-icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #dcfce7;
+    color: #16a34a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem;
+}
+.notif-empty-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+}
+.notif-empty-desc {
+    font-size: 0.75rem;
+    color: #64748b;
+    line-height: 1.4;
+    margin: 0 auto;
+    max-width: 250px;
+}
+
+.notif-footer {
+    padding: 0.65rem 0.85rem;
+    border-top: 1px solid var(--clr-border);
+    background: #fafbfc;
+}
+.notif-footer-btn {
+    width: 100%;
+    padding: 0.45rem 0.65rem;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--clr-primary);
+    font-size: 0.785rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    transition: background 0.15s;
+}
+.notif-footer-btn:hover {
+    background-color: var(--clr-primary-light);
 }
 
 .header-divider {
@@ -295,13 +630,13 @@ async function eksekusiKeluar() {
 /* Dropdown Popup */
 .profile-popup {
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 8px);
     right: 0;
     width: 250px;
     background: #ffffff;
     border: 1px solid var(--clr-border);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-modal);
     padding: 0.85rem;
     z-index: 40;
 }
@@ -389,7 +724,7 @@ async function eksekusiKeluar() {
     transition: all var(--transition);
 }
 .popup-item:hover {
-    background-color: var(--clr-bg-subtle);
+    background-color: var(--clr-surface-hover);
     color: var(--clr-primary);
 }
 

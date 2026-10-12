@@ -53,7 +53,12 @@ class PengendaliPemasok extends Controller
 
     public function hapus(Pemasok $pemasok): JsonResponse
     {
-        $pemasok->delete();
-        return response()->json(['berhasil' => true, 'pesan' => 'Pemasok berhasil dihapus.']);
+        try {
+            $nama = $pemasok->nama;
+            $pemasok->delete();
+            return response()->json(['berhasil' => true, 'pesan' => "Pemasok \"{$nama}\" berhasil dihapus."]);
+        } catch (\Throwable $e) {
+            return response()->json(['berhasil' => false, 'pesan' => 'Gagal menghapus pemasok: ' . $e->getMessage()], 422);
+        }
     }
 }

@@ -920,3 +920,72 @@ body {
     margin-bottom: 1.35rem;
     gap: 1rem;
 }
+
+/* ===== PRINT STYLES FOR LAPORAN TOKO ===== */
+@media print {
+    body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 8.5pt !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Sembunyikan navigasi, tombol, dan elemen SPA yang tidak relevan di kertas */
+    .app-sidebar,
+    .app-header,
+    .tab-bar,
+    .laporan-toolbar,
+    .btn,
+    .sidebar-container,
+    .header-container,
+    .toast-container,
+    .no-print {
+        display: none !important;
+    }
+
+    .app-main,
+    .main-content,
+    .table-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .print-only {
+        display: block !important;
+    }
+
+    .app-table,
+    .data-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+
+    .app-table tr,
+    .data-table tr {
+        page-break-inside: avoid !important;
+    }
+
+    .app-table thead,
+    .data-table thead {
+        display: table-header-group !important;
+    }
+
+    .app-table th,
+    .data-table th {
+        background-color: #1e293b !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    @page {
+        margin: 10mm 12mm 12mm 12mm;
+        size: auto;
+    }
+}
+

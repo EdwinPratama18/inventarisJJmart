@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 // ===== Autentikasi =====
 Route::post('/masuk', [PengendaliAutentikasi::class, 'masuk']);
+Route::get('/laporan/export-pdf-direct', [PengendaliLaporan::class, 'exportPdf']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -64,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/stok-saat-ini', [PengendaliLaporan::class, 'stokSaatIni']);
         Route::get('/riwayat-transaksi', [PengendaliLaporan::class, 'riwayatTransaksi']);
         Route::get('/riwayat-reorder', [PengendaliLaporan::class, 'riwayatReorder']);
+        Route::get('/export-pdf', [PengendaliLaporan::class, 'exportPdf']);
     });
 
 });

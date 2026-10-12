@@ -475,12 +475,16 @@ import Ikon
 import api
     from '../layanan/api';
 
+import { gunakanTokoNotifikasi }
+    from '../toko/notifikasi';
+
 
 /* =========================================
-   ROUTE
+   ROUTE & STORE
    ========================================= */
 
 const route = useRoute();
+const notifStore = gunakanTokoNotifikasi();
 
 
 /* =========================================
@@ -612,6 +616,7 @@ async function simpan() {
         muatRiwayat();
 
         await muatBarang();
+        notifStore.muatNotifikasi();
 
     } catch (err) {
 

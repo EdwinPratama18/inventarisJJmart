@@ -116,15 +116,23 @@ async function onSimpan(payload) {
 
 async function konfirmasiHapus(b) {
     if (!confirm(`Nonaktifkan barang "${b.nama}"?`)) return;
-    await toko.hapus(b.id);
-    tampilkanToast('Barang telah dinonaktifkan.', 'warning');
-    muatBarang();
+    try {
+        await toko.hapus(b.id);
+        tampilkanToast(`Barang "${b.nama}" telah dinonaktifkan.`, 'warning');
+        muatBarang();
+    } catch (err) {
+        tampilkanToast(err.response?.data?.pesan ?? 'Gagal menonaktifkan barang.', 'error');
+    }
 }
 
 async function hitungUlangROP(b) {
-    await toko.hitungUlangROP(b.id);
-    tampilkanToast('Reorder Point (ROP) berhasil dihitung ulang.');
-    muatBarang();
+    try {
+        await toko.hitungUlangROP(b.id);
+        tampilkanToast(`Reorder Point (ROP) "${b.nama}" berhasil dihitung ulang.`);
+        muatBarang();
+    } catch (err) {
+        tampilkanToast(err.response?.data?.pesan ?? 'Gagal menghitung ulang ROP.', 'error');
+    }
 }
 
 function onFilter(f) {

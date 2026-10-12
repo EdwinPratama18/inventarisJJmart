@@ -38,7 +38,12 @@ class PengendaliKategori extends Controller
 
     public function hapus(Kategori $kategori): JsonResponse
     {
-        $kategori->delete();
-        return response()->json(['berhasil' => true, 'pesan' => 'Kategori berhasil dihapus.']);
+        try {
+            $nama = $kategori->nama;
+            $kategori->delete();
+            return response()->json(['berhasil' => true, 'pesan' => "Kategori \"{$nama}\" berhasil dihapus."]);
+        } catch (\Throwable $e) {
+            return response()->json(['berhasil' => false, 'pesan' => 'Gagal menghapus kategori: ' . $e->getMessage()], 422);
+        }
     }
 }

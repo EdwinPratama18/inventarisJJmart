@@ -70,10 +70,12 @@ class PengendaliBarang extends Controller
     public function simpan(SimpanBarangRequest $request): JsonResponse
     {
         $barang = Barang::create($request->validated());
+        $this->layananROP->hitungDanSimpan($barang);
+        $this->layananCekStok->cekDanNotifikasi($barang);
 
         return response()->json([
             'berhasil' => true,
-            'data' => $barang->load(['kategori', 'pemasok']),
+            'data' => $barang->fresh()->load(['kategori', 'pemasok']),
             'pesan' => 'Barang berhasil ditambahkan.',
         ], 201);
     }
@@ -89,6 +91,7 @@ class PengendaliBarang extends Controller
     public function perbarui(SimpanBarangRequest $request, Barang $barang): JsonResponse
     {
         $barang->update($request->validated());
+        $this->layananROP->hitungDanSimpan($barang);
         $this->layananCekStok->cekDanNotifikasi($barang);
 
         return response()->json([

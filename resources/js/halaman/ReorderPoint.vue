@@ -181,8 +181,10 @@ import { useRouter } from 'vue-router';
 import BadgeStatusStok from '../komponen/BadgeStatusStok.vue';
 import Ikon from '../komponen/Ikon.vue';
 import api from '../layanan/api';
+import { gunakanTokoNotifikasi } from '../toko/notifikasi';
 
 const router = useRouter();
+const notifStore = gunakanTokoNotifikasi();
 
 const memuat = ref(false);
 const sedangMenghitung = ref(false);
@@ -195,6 +197,7 @@ async function muatDataROP() {
     try {
         const { data } = await api.get('/barang', { params: { status: 'PERLU_PEMESANAN', per_halaman: 100 } });
         dataReorder.value = data.data;
+        notifStore.muatNotifikasi();
     } catch (_) {
     } finally {
         memuat.value = false;

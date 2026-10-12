@@ -194,8 +194,10 @@ import BadgeStatusStok from '../komponen/BadgeStatusStok.vue';
 import CariBarang from '../komponen/CariBarang.vue';
 import Ikon from '../komponen/Ikon.vue';
 import api from '../layanan/api';
+import { gunakanTokoNotifikasi } from '../toko/notifikasi';
 
 const route = useRoute();
+const notifStore = gunakanTokoNotifikasi();
 const daftarBarang = ref([]);
 const barangDipilih = ref(null);
 const riwayat = ref([]);
@@ -248,6 +250,7 @@ async function simpan() {
         halamanAktif.value = 1;
         muatRiwayat();
         await muatBarang();
+        notifStore.muatNotifikasi();
     } catch (err) {
         if (err.response?.data?.errors) {
             galat.value = err.response.data.errors;

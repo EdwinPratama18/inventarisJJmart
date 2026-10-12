@@ -46,8 +46,15 @@
                 <span>Barang Keluar</span>
             </RouterLink>
             <!-- Reorder Point: Manager only -->
-            <RouterLink v-if="isAdmin" to="/rop" class="menu-item" :class="{ active: $route.name === 'reorder-point' }">
-                <Ikon nama="kritis" :ukuran="18" />
+            <RouterLink
+                v-if="isAdmin"
+                to="/rop"
+                class="menu-item"
+                :class="{ active: $route.name === 'reorder-point', 'menu-item-warning': jmlKritis > 0 }"
+            >
+                <!-- Tanda warning HANYA muncul jika ada barang yang perlu di-reorder (jmlKritis > 0). Jika 0, warning hilang! -->
+                <Ikon v-if="jmlKritis > 0" nama="warning" :ukuran="18" class="text-warning-alert" />
+                <Ikon v-else nama="refresh" :ukuran="18" />
                 <span>Reorder Point</span>
                 <span class="menu-badge-rop" v-if="jmlKritis > 0">{{ jmlKritis }}</span>
             </RouterLink>
@@ -68,25 +75,22 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import Ikon from './Ikon.vue';
-import api from '../layanan/api';
 import { gunakanTokoAutentikasi } from '../toko/autentikasi';
+import { gunakanTokoNotifikasi } from '../toko/notifikasi';
 
-const toko    = gunakanTokoAutentikasi();
+const toko = gunakanTokoAutentikasi();
+const notifStore = gunakanTokoNotifikasi();
 const isAdmin = computed(() => toko.isAdmin);
 
-const jmlKritis = ref(0);
+const jmlKritis = computed(() => notifStore.jmlKritis);
 
-async function muatKritis() {
-    if (!isAdmin.value) return; // Staff tidak perlu muat kritis
-    try {
-        const { data } = await api.get('/dasbor/ringkasan');
-        jmlKritis.value = data.data.barang_kritis ?? 0;
-    } catch (_) {}
-}
-
-onMounted(muatKritis);
+onMounted(() => {
+    if (isAdmin.value) {
+        notifStore.muatNotifikasi();
+    }
+});
 </script>
 
 <style scoped>
@@ -171,8 +175,14 @@ onMounted(muatKritis);
     stroke: var(--clr-primary);
 }
 
+.text-warning-alert {
+    color: #e11d48;
+}
+.menu-item:not(.active) .text-warning-alert {
+    color: #e11d48;
+}
 .menu-badge-rop {
-    background: var(--clr-danger);
+    background: #e11d48;
     color: #ffffff;
     font-size: 0.67rem;
     font-weight: 700;
@@ -180,6 +190,7 @@ onMounted(muatKritis);
     border-radius: 99px;
     line-height: 1.4;
     margin-left: auto;
+    box-shadow: 0 2px 4px rgba(225, 29, 72, 0.35);
 }
 
 .role-badge {
