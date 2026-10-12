@@ -17,7 +17,7 @@ class PengendaliLaporan extends Controller
     {
         $query = Barang::with(['kategori', 'pemasok'])->where('aktif', true);
 
-        if ($request->has('kategori_id')) {
+        if ($request->filled('kategori_id')) {
             $query->where('kategori_id', $request->kategori_id);
         }
 
@@ -41,10 +41,21 @@ class PengendaliLaporan extends Controller
         $dari = $request->input('dari', Carbon::now()->startOfMonth()->toDateString());
         $sampai = $request->input('sampai', Carbon::now()->toDateString());
 
-        $transaksi = Transaksi::with(['barang', 'pengguna'])
-            ->whereBetween('tanggal', [$dari, "{$sampai} 23:59:59"])
-            ->orderByDesc('tanggal')
-            ->paginate(50);
+        $query = Transaksi::with(['barang', 'pengguna'])
+            ->whereBetween('tanggal', ["{$dari} 00:00:00", "{$sampai} 23:59:59"])
+            ->orderByDesc('tanggal');
+
+        if ($request->filled('jenis') && in_array($request->jenis, ['masuk', 'keluar'])) {
+            $query->where('jenis', $request->jenis);
+        }
+
+        if ($request->filled('barang_id')) {
+            $query->where('barang_id', $request->barang_id);
+        }
+
+        $perHalaman = min((int) $request->input('per_halaman', 50), 500);
+        $halaman = (int) $request->input('halaman', $request->input('page', 1));
+        $transaksi = $query->paginate($perHalaman, ['*'], 'page', $halaman);
 
         return response()->json([
             'berhasil' => true,

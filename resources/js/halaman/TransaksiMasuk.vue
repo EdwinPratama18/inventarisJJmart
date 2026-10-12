@@ -552,9 +552,11 @@ const daftarHalaman = computed(() => {
 });
 
 
-/* =========================================
-   DEFAULT FORM
-   ========================================= */
+const waktuLokalISO = () => {
+    const d = new Date();
+    const offset = d.getTimezoneOffset() * 60000;
+    return new Date(d.getTime() - offset).toISOString().slice(0, 16);
+};
 
 const defaultForm = () => ({
     barang_id: '',
@@ -563,9 +565,7 @@ const defaultForm = () => ({
     harga_satuan: 0,
     referensi: '',
     catatan: '',
-    tanggal: new Date()
-        .toISOString()
-        .slice(0, 16),
+    tanggal: waktuLokalISO(),
 });
 
 
@@ -582,6 +582,10 @@ function pilihBarang(b) {
 
     form.value.barang_id =
         b ? b.id : '';
+
+    if (b && (!form.value.harga_satuan || form.value.harga_satuan === 0)) {
+        form.value.harga_satuan = Number(b.harga_beli || 0);
+    }
 
 }
 

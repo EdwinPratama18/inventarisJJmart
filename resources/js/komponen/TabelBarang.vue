@@ -22,6 +22,15 @@
                 <option value="PERINGATAN">Mendekati ROP</option>
                 <option value="AMAN">Stok Aman</option>
             </select>
+            <button
+                v-if="cariQuery || filterKategori || filterStatus"
+                class="btn btn-secondary btn-sm"
+                @click="resetFilter"
+                title="Reset semua filter"
+            >
+                <Ikon nama="refresh" :ukuran="13" />
+                <span>Reset</span>
+            </button>
         </div>
 
         <!-- Table -->
@@ -173,12 +182,19 @@ function onCari() {
 function onFilterKategori() { emitFilter(); }
 function onFilterStatus() { emitFilter(); }
 
+function resetFilter() {
+    cariQuery.value = '';
+    filterKategori.value = '';
+    filterStatus.value = '';
+    emitFilter();
+}
+
 function emitFilter() {
-    emit('filter-ubah', {
-        cari: cariQuery.value,
-        kategori_id: filterKategori.value,
-        status: filterStatus.value,
-    });
+    const f = {};
+    if (cariQuery.value && cariQuery.value.trim()) f.cari = cariQuery.value.trim();
+    if (filterKategori.value) f.kategori_id = filterKategori.value;
+    if (filterStatus.value) f.status = filterStatus.value;
+    emit('filter-ubah', f);
 }
 
 function gantiHalaman(h) {

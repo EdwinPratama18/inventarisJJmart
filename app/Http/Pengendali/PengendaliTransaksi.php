@@ -20,16 +20,32 @@ class PengendaliTransaksi extends Controller
         $query = Transaksi::with(['barang', 'pengguna'])
             ->orderByDesc('tanggal');
 
-        if ($request->has('barang_id')) {
+        if ($request->filled('barang_id')) {
             $query->where('barang_id', $request->barang_id);
         }
 
-        if ($request->has('jenis')) {
+        if ($request->filled('jenis') && in_array($request->jenis, ['masuk', 'keluar'])) {
             $query->where('jenis', $request->jenis);
         }
 
-        if ($request->has('dari') && $request->has('sampai')) {
-            $query->whereBetween('tanggal', [$request->dari, $request->sampai]);
+        if ($request->filled('dari')) {
+            $query->where('tanggal', '>=', "{$request->dari} 00:00:00");
+        }
+
+        if ($request->filled('sampai')) {
+            $query->where('tanggal', '<=', "{$request->sampai} 23:59:59");
+        }
+
+        if ($request->filled('cari')) {
+            $cari = trim($request->cari);
+            $query->where(function ($q) use ($cari) {
+                $q->where('referensi', 'like', "%{$cari}%")
+                  ->orWhere('catatan', 'like', "%{$cari}%")
+                  ->orWhereHas('barang', function ($bq) use ($cari) {
+                      $bq->where('nama', 'like', "%{$cari}%")
+                         ->orWhere('kode_barang', 'like', "%{$cari}%");
+                  });
+            });
         }
 
         $perHalaman = min($request->input('per_halaman', 20), 500);
@@ -68,8 +84,13 @@ class PengendaliTransaksi extends Controller
                 ? $stokSebelum + $data['jumlah']
                 : $stokSebelum - $data['jumlah'];
 
+            $hargaSatuan = !empty($data['harga_satuan']) && (float) $data['harga_satuan'] > 0
+                ? (float) $data['harga_satuan']
+                : (float) ($data['jenis'] === 'keluar' ? ($barang->harga_jual ?: $barang->harga_beli ?: 0) : ($barang->harga_beli ?: 0));
+
             $transaksi = Transaksi::create([
                 ...$data,
+                'harga_satuan' => $hargaSatuan,
                 'stok_sebelum' => $stokSebelum,
                 'stok_sesudah' => $stokSesudah,
                 'pengguna_id' => $request->user()->id,

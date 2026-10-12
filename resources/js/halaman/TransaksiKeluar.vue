@@ -57,6 +57,7 @@
                         </div>
 
                         <!-- Jumlah & Referensi -->
+                        <!-- Jumlah & Harga Satuan -->
                         <div class="form-row-2">
                             <div class="form-group">
                                 <label class="form-label">Jumlah Keluar <span style="color:var(--clr-danger);">*</span></label>
@@ -71,15 +72,29 @@
                                 <div class="form-error" v-if="galat.jumlah">{{ galat.jumlah[0] }}</div>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">No. Referensi / Faktur</label>
-                                <input type="text" class="form-control" v-model="form.referensi" placeholder="Contoh: INV-2026-001" />
+                                <label class="form-label">Harga Satuan (Rp)</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    v-model.number="form.harga_satuan"
+                                    min="0"
+                                    step="100"
+                                    placeholder="0"
+                                />
+                                <div class="form-error" v-if="galat.harga_satuan">{{ galat.harga_satuan[0] }}</div>
                             </div>
                         </div>
 
-                        <!-- Tanggal -->
-                        <div class="form-group">
-                            <label class="form-label">Tanggal Transaksi</label>
-                            <input type="datetime-local" class="form-control" v-model="form.tanggal" />
+                        <!-- Referensi & Tanggal -->
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label class="form-label">No. Referensi / Faktur</label>
+                                <input type="text" class="form-control" v-model="form.referensi" placeholder="Contoh: INV-2026-001" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tanggal Transaksi</label>
+                                <input type="datetime-local" class="form-control" v-model="form.tanggal" />
+                            </div>
                         </div>
 
                         <!-- Catatan -->
@@ -224,24 +239,43 @@ const daftarHalaman = computed(() => {
     return pages;
 });
 
+const waktuLokalISO = () => {
+    const d = new Date();
+    const offset = d.getTimezoneOffset() * 60000;
+    return new Date(d.getTime() - offset).toISOString().slice(0, 16);
+};
+
 const defaultForm = () => ({
     barang_id: '',
     jenis: 'keluar',
     jumlah: 1,
+    harga_satuan: 0,
     referensi: '',
     catatan: '',
-    tanggal: new Date().toISOString().slice(0, 16),
+    tanggal: waktuLokalISO(),
 });
 const form = ref(defaultForm());
 
 function pilihBarang(b) {
     barangDipilih.value = b ?? null;
     form.value.barang_id = b ? b.id : '';
+    if (b) {
+        form.value.harga_satuan = Number(b.harga_jual || b.harga_beli || 0);
+    }
 }
 
 async function simpan() {
     galat.value = {};
     galatGlobal.value = '';
+
+    if (barangDipilih.value && form.value.jumlah > barangDipilih.value.stok_saat_ini) {
+        const pesan = `Stok tidak mencukupi. Stok tersedia: ${barangDipilih.value.stok_saat_ini} ${barangDipilih.value.satuan}`;
+        galat.value = { jumlah: [pesan] };
+        galatGlobal.value = pesan;
+        tampilkanToast(pesan, 'error');
+        return;
+    }
+
     menyimpan.value = true;
     try {
         await api.post('/transaksi', form.value);
@@ -257,9 +291,7 @@ async function simpan() {
         } else {
             galatGlobal.value = err.response?.data?.pesan ?? 'Gagal menyimpan transaksi.';
         }
-        if (err.response?.status === 422) {
-            tampilkanToast(galatGlobal.value || 'Validasi gagal.', 'error');
-        }
+        tampilkanToast(galatGlobal.value || 'Gagal menyimpan transaksi.', 'error');
     } finally {
         menyimpan.value = false;
     }

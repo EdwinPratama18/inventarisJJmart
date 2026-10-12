@@ -14,7 +14,7 @@ class SimpanTransaksiRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'harga_satuan' => $this->harga_satuan !== '' && $this->harga_satuan !== null ? (float) $this->harga_satuan : null,
+            'harga_satuan' => ($this->harga_satuan !== '' && $this->harga_satuan !== null) ? (float) $this->harga_satuan : 0,
             'referensi' => $this->referensi ?: null,
             'catatan' => $this->catatan ?: null,
             'tanggal' => $this->tanggal ?: now(),

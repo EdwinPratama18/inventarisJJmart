@@ -21,20 +21,20 @@ class PengendaliBarang extends Controller
     {
         $query = Barang::with(['kategori', 'pemasok'])->where('aktif', true);
 
-        if ($request->has('cari')) {
-            $cari = $request->cari;
+        if ($request->filled('cari')) {
+            $cari = trim($request->cari);
             $query->where(function ($q) use ($cari) {
                 $q->where('nama', 'like', "%{$cari}%")
                   ->orWhere('kode_barang', 'like', "%{$cari}%");
             });
         }
 
-        if ($request->has('kategori_id')) {
+        if ($request->filled('kategori_id')) {
             $query->where('kategori_id', $request->kategori_id);
         }
 
-        if ($request->has('status')) {
-            $status = strtoupper($request->status);
+        if ($request->filled('status')) {
+            $status = strtoupper(trim($request->status));
             switch ($status) {
                 case 'PERLU_PEMESANAN':
                 case 'KRITIS':
@@ -52,8 +52,9 @@ class PengendaliBarang extends Controller
             }
         }
 
-        $perHalaman = min($request->input('per_halaman', 15), 100);
-        $barang = $query->orderBy('nama')->paginate($perHalaman);
+        $perHalaman = min((int) $request->input('per_halaman', 15), 100);
+        $halaman = (int) $request->input('halaman', $request->input('page', 1));
+        $barang = $query->orderBy('nama')->paginate($perHalaman, ['*'], 'page', $halaman);
 
         return response()->json([
             'berhasil' => true,

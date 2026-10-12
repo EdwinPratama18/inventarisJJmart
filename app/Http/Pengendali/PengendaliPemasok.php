@@ -12,8 +12,14 @@ class PengendaliPemasok extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = Pemasok::query();
-        if ($request->has('cari')) {
-            $query->where('nama', 'like', "%{$request->cari}%");
+        if ($request->filled('cari')) {
+            $cari = trim($request->cari);
+            $query->where(function ($q) use ($cari) {
+                $q->where('nama', 'like', "%{$cari}%")
+                  ->orWhere('kontak', 'like', "%{$cari}%")
+                  ->orWhere('telepon', 'like', "%{$cari}%")
+                  ->orWhere('email', 'like', "%{$cari}%");
+            });
         }
         return response()->json(['berhasil' => true, 'data' => $query->orderBy('nama')->get()]);
     }
